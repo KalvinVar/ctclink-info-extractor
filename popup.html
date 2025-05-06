@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ctcLink Info Extractor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 300px;
+      padding: 10px;
+    }
+    
+    h1 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .info-box {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .info-row {
+      margin-bottom: 5px;
+    }
+    
+    .label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    .value {
+      word-break: break-word;
+    }
+    
+    .status {
+      font-style: italic;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: #4285f4;
+      color: white;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background-color: #3367d6;
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .error {
+      color: #d32f2f;
+      font-size: 12px;
+    }
+    
+    .main-button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #2196F3;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .main-button:hover {
+      background-color: #0b7dda;
+    }
+  </style>
+</head>
+<body>
+  <h1>ctcLink Info Extractor</h1>
+  
+  <div class="info-box">
+    <div class="info-row">
+      <span class="label">Name:</span>
+      <span class="value" id="nameValue">Not extracted yet</span>
+    </div>
+    <div class="info-row">
+      <span class="label">DOB:</span>
+      <span class="value" id="dobValue">Not extracted yet</span>
+    </div>
+  </div>
+  
+  <div class="info-box">
+    <div class="info-row">
+      <span class="label">Degree:</span>
+      <span class="value" id="degreeValue">Not extracted yet</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Progress:</span>
+      <span class="value" id="progressValue">Not extracted yet</span>
+    </div>
+  </div>
+  
+  <div class="status" id="status">Ready to extract information</div>
+  
+  <button id="extractAllButton" class="main-button">Extract All Info</button>
+  
+  <div class="buttons">
+    <button id="extractButton">Extract Current Page</button>
+    <button id="goToProfileButton">Profile Page</button>
+    <button id="goToDegreeButton">Degree Progress</button>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

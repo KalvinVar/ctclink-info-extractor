@@ -1,0 +1,11 @@
+[40828:43260:0504/004109.890:INFO:chrome_browser_cloud_management_controller.cc(202)] No machine level policy manager exists.
+[40828:43260:0504/004111.982:INFO:CONSOLE(33)] "Uncaught ReferenceError: refreshOnExpired is not defined", source: https://ptprd.ctclink.us/psp/ptprd/EMPLOYEE/EMPL/h/?tab=DEFAULT (33)
+[40828:43260:0504/004111.991:INFO:CONSOLE(191)] "Uncaught ReferenceError: False is not defined", source: https://ptprd.ctclink.us/psp/ptprd/EMPLOYEE/EMPL/h/?tab=DEFAULT (191)
+[40828:43260:0504/004112.412:INFO:CONSOLE(39)] "Uncaught ReferenceError: refreshOnExpired is not defined", source: https://ptprd.ctclink.us/psp/ptprd/EMPLOYEE/EMPL/h/?tab=CTC_OC_HP&pslnkid=CTC_OC_HP_LINK (39)
+[40828:43260:0504/004112.417:INFO:CONSOLE(200)] "Uncaught ReferenceError: False is not defined", source: https://ptprd.ctclink.us/psp/ptprd/EMPLOYEE/EMPL/h/?tab=CTC_OC_HP&pslnkid=CTC_OC_HP_LINK (200)
+[40828:43260:0504/004114.079:ERROR:device_event_log_impl.cc(202)] [00:41:14.079] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: Element not found. (0x490)
+[40828:43260:0504/004124.451:INFO:CONSOLE(0)] "<meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">", source: https://csprd.ctclink.us/psc/csprd/EMPLOYEE/SA/c/NUI_FRAMEWORK.PT_LANDINGPAGE.GBL?LP=CTC_STUDENT_HOMEPAGE_FL (0)
+[40828:43260:0504/004124.780:INFO:CONSOLE(0)] "<meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">", source: https://csprd.ctclink.us/psc/csprd/EMPLOYEE/SA/c/NUI_FRAMEWORK.PT_LANDINGPAGE.GBL?LP=CTC_STUDENT_HOMEPAGE_FL (0)
+[12952:8848:0504/004124.933:ERROR:ssl_client_socket_impl.cc(877)] handshake failed; returned -1, SSL error code 1, net_error -200
+[12952:19076:0504/004134.187:WARNING:sqlite_persistent_store_backend_base.cc(176)] Failed to post task from FlushAndNotifyInBackground@net\extras\sqlite\sqlite_persistent_store_backend_base.cc:226 to client_task_runner_.
+[12952:19076:0504/004134.187:WARNING:sqlite_persistent_store_backend_base.cc(176)] Failed to post task from FlushAndNotifyInBackground@net\extras\sqlite\sqlite_persistent_store_backend_base.cc:226 to client_task_runner_.
