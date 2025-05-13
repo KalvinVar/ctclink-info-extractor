@@ -256,6 +256,53 @@ function extractDegreeInfo() {
   return result;
 }
 
+// Add this function to extract data from the page script
+function extractDataFromScript() {
+  // Look for the window.highpoint object that contains user data
+  if (window.highpoint && window.highpoint.NAMES) {
+    const result = {
+      name: null,
+      dob: null
+    };
+    
+    // Find preferred name
+    const preferredName = window.highpoint.NAMES.find(name => name.NAME_TYPE === "PRF");
+    if (preferredName && preferredName.NAME_PARTS) {
+      // Construct the full name from parts
+      const prefix = preferredName.NAME_PARTS.find(part => part.name_part === "NAME_PREFIX")?.name_part_value || '';
+      const firstName = preferredName.NAME_PARTS.find(part => part.name_part === "FIRST_NAME")?.name_part_value || '';
+      const middleName = preferredName.NAME_PARTS.find(part => part.name_part === "MIDDLE_NAME")?.name_part_value || '';
+      const lastName = preferredName.NAME_PARTS.find(part => part.name_part === "LAST_NAME")?.name_part_value || '';
+      
+      // Construct full name (format according to your preference)
+      result.name = [prefix, firstName, middleName, lastName].filter(Boolean).join(' ').trim();
+    }
+    
+    // If no preferred name, try primary name
+    if (!result.name) {
+      const primaryName = window.highpoint.NAMES.find(name => name.NAME_TYPE === "PRI");
+      if (primaryName && primaryName.NAME_PARTS) {
+        const prefix = primaryName.NAME_PARTS.find(part => part.name_part === "NAME_PREFIX")?.name_part_value || '';
+        const firstName = primaryName.NAME_PARTS.find(part => part.name_part === "FIRST_NAME")?.name_part_value || '';
+        const middleName = primaryName.NAME_PARTS.find(part => part.name_part === "MIDDLE_NAME")?.name_part_value || '';
+        const lastName = primaryName.NAME_PARTS.find(part => part.name_part === "LAST_NAME")?.name_part_value || '';
+        
+        result.name = [prefix, firstName, middleName, lastName].filter(Boolean).join(' ').trim();
+      }
+    }
+    
+    // Try to get DOB from window.highpoint if available
+    if (window.highpoint.PERSONAL_DATA && window.highpoint.PERSONAL_DATA.BIRTHDATE) {
+      result.dob = window.highpoint.PERSONAL_DATA.BIRTHDATE;
+    }
+    
+    console.log("Extracted data from script:", result);
+    return result;
+  }
+  
+  return null;
+}
+
 // Listen for messages from the extension
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === "checkPage") {
@@ -268,6 +315,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === "extractInfo") {
     // If we're on the profile page
     if (window.location.href.includes('WEBLIB_HCX_PF.H_BIO_INFO')) {
+      // First try to extract directly from script
+      const scriptData = extractDataFromScript();
+      
+      if (scriptData && scriptData.name) {
+        console.log("Successfully extracted data from script:", scriptData);
+        sendResponse(scriptData);
+        return true;
+      }
+      
+      // Fall back to DOM scraping if script extraction fails
+      console.log("Script extraction failed, falling back to DOM extraction");
       let result = {};
       
       // Delay extraction to ensure page is fully loaded
