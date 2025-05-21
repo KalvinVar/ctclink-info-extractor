@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ctcLink Info Extractor</title>
+  <title>ctcLink Data Fetcher</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      width: 300px;
-      padding: 10px;
+      width: 350px;
+      padding: 15px;
     }
     
     h1 {
       font-size: 18px;
       color: #333;
       margin-bottom: 15px;
+      text-align: center;
     }
     
     .info-box {
@@ -39,22 +40,21 @@
     .status {
       font-style: italic;
       font-size: 12px;
-      margin-bottom: 10px;
-    }
-    
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
+      margin: 10px 0;
+      text-align: center;
+      color: #666;
     }
     
     button {
-      padding: 8px 12px;
+      width: 100%;
+      padding: 8px 10px;
       border: none;
       border-radius: 4px;
       background-color: #4285f4;
       color: white;
       cursor: pointer;
+      font-size: 13px;
+      margin-top: 5px;
     }
     
     button:hover {
@@ -64,11 +64,6 @@
     button:disabled {
       background-color: #cccccc;
       cursor: not-allowed;
-    }
-    
-    .error {
-      color: #d32f2f;
-      font-size: 12px;
     }
     
     .main-button {
@@ -86,55 +81,242 @@
     .main-button:hover {
       background-color: #0b7dda;
     }
+
+    .card {
+      margin-top: 15px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .card-header {
+      background-color: #4285f4;
+      color: white;
+      padding: 10px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      font-weight: bold;
+    }
+
+    .card-body {
+      padding: 10px;
+    }
+
+    #scheduleData {
+      font-size: 14px;
+      color: #333;
+    }
+
+    #termValue {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    #courseList {
+      margin-left: 0;
+    }
+
+    .course-item {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 10px;
+      background-color: white;
+    }
+
+    .meetings-list {
+      margin-top: 8px;
+      padding-top: 5px;
+      border-top: 1px dashed #ddd;
+    }
+
+    .meeting-item {
+      margin-bottom: 5px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .result-container {
+      margin-top: 10px;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f0f0f0;
+      display: none;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .result-container pre {
+      white-space: pre-wrap;
+      word-break: break-all;
+      font-size: 11px;
+      margin: 0;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #eee;
+      margin: 10px 0;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .budget-details-section {
+      margin-top: 15px;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+    }
+
+    .budget-details-container {
+      font-size: 13px;
+    }
+
+    .term-header {
+      margin: 10px 0 5px;
+      font-size: 14px;
+      color: #4285f4;
+    }
+
+    .budget-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    .budget-table th, .budget-table td {
+      padding: 4px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .budget-table th {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .amount {
+      text-align: right;
+    }
+
+    .total-row {
+      font-weight: bold;
+      background-color: #f5f5f5;
+    }
+
+    .total-label {
+      text-align: right;
+      padding-right: 10px;
+    }
+
+    .total-amount {
+      text-align: right;
+    }
+
+    .total-cost {
+      font-weight: bold;
+      text-align: right;
+      margin: 10px 0;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
-  <h1>ctcLink Info Extractor</h1>
+  <h1>ctcLink Direct Data Fetcher</h1>
+  
+  <div class="status" id="status">Ready to fetch information</div>
+  
+  <button id="fetchAllButton" class="main-button">Fetch All Information</button>
   
   <div class="info-box">
     <div class="info-row">
       <span class="label">Name:</span>
-      <span class="value" id="nameValue">Not extracted yet</span>
+      <span class="value" id="nameValue">Not fetched yet</span>
     </div>
     <div class="info-row">
       <span class="label">DOB:</span>
-      <span class="value" id="dobValue">Not extracted yet</span>
+      <span class="value" id="dobValue">Not fetched yet</span>
+    </div>
+    <button id="testDirectFetchButton">Fetch Bio Info</button>
+    <div id="fetchTestResult" class="result-container">
+      <pre></pre>
     </div>
   </div>
   
   <div class="info-box">
     <div class="info-row">
       <span class="label">Degree:</span>
-      <span class="value" id="degreeValue">Not extracted yet</span>
+      <span class="value" id="degreeValue">Not fetched yet</span>
     </div>
     <div class="info-row">
       <span class="label">Progress:</span>
-      <span class="value" id="progressValue">Not extracted yet</span>
+      <span class="value" id="progressValue">Not fetched yet</span>
+    </div>
+    <button id="testDegreeFetchButton">Fetch Degree Info</button>
+    <div id="degreeFetchTestResult" class="result-container">
+      <pre></pre>
     </div>
   </div>
-  
-  <div class="status" id="status">Ready to extract information</div>
-  
-  <button id="extractAllButton" class="main-button">Extract All Info</button>
-  
-  <div class="buttons">
-    <button id="extractButton">Extract Current Page</button>
-    <button id="goToProfileButton">Profile Page</button>
-    <button id="goToDegreeButton">Degree Progress</button>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="label">Aid Year:</span>
+      <span class="value" id="aidYearValue">Not fetched yet</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Estimated Budget:</span>
+      <span class="value" id="budgetValue">Not fetched yet</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Student Aid Index:</span>
+      <span class="value" id="contributionValue">Not fetched yet</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Estimated Need:</span>
+      <span class="value" id="needValue">Not fetched yet</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Total Aid Awarded:</span>
+      <span class="value" id="totalAidValue">Not fetched yet</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Remaining Need:</span>
+      <span class="value" id="remainingNeedValue">Not fetched yet</span>
+    </div>
+    <button id="testFinancialAidFetchButton">Fetch Financial Aid Info</button>
+    <div id="financialAidFetchTestResult" class="result-container">
+      <pre></pre>
+    </div>
   </div>
-  
-  <button id="testDirectFetchButton" class="btn btn-secondary">
-    Test Direct Fetch
-  </button>
-  <div id="fetchTestResult" style="margin-top: 10px; padding: 5px; border: 1px solid #ddd; display: none;">
-    <pre style="white-space: pre-wrap; word-break: break-all;"></pre>
+
+  <div class="budget-details-section">
+    <h3>Budget Details by Term</h3>
+    <div id="budgetDetailsContainer" class="budget-details-container">
+      <p class="small">Budget details will appear here after fetching financial aid information.</p>
+    </div>
   </div>
-  
-  <button id="testDegreeFetchButton" class="btn btn-secondary">
-    Test Degree Fetch
-  </button>
-  <div id="degreeFetchTestResult" style="margin-top: 10px; padding: 5px; border: 1px solid #ddd; display: none;">
-    <pre style="white-space: pre-wrap; word-break: break-all;"></pre>
+
+  <div class="card">
+    <div class="card-header">Course Schedule</div>
+    <div class="card-body">
+      <div id="scheduleData">
+        <div class="info-row">
+          <span class="label">Term:</span>
+          <span class="value" id="termValue">Not fetched yet</span>
+        </div>
+        <div id="courseList"></div>
+      </div>
+      <button id="testScheduleFetchButton">Fetch Schedule Info</button>
+      <div id="scheduleFetchTestResult" class="result-container">
+        <pre></pre>
+      </div>
+    </div>
   </div>
   
   <script src="popup.js"></script>

@@ -1,30 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "ctcLink Info Extractor",
+  "name": "ctcLink Data Extractor",
   "version": "1.0",
-  "description": "Extracts name and birth date from ctcLink profile page",
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
+  "description": "Extracts data from ctcLink",
   "action": {
     "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
+    "default_title": "ctcLink Data Extractor"
   },
   "permissions": [
-    "activeTab",
     "storage",
-    "scripting"
+    "activeTab"
   ],
   "host_permissions": [
-    "https://csprd.ctclink.us/*",
-    "https://ptprd.ctclink.us/*",
-    "https://gateway.ctclink.us/*"
+    "https://csprd.ctclink.us/*"
   ],
   "background": {
     "service_worker": "background.js"
