@@ -31,6 +31,23 @@ document.addEventListener('DOMContentLoaded', function() {
   const totalAidValue = document.getElementById('totalAidValue');
   const remainingNeedValue = document.getElementById('remainingNeedValue');
   
+  // Add export button references
+  const exportCSVBtn = document.getElementById('exportCSV');
+  const exportJSONBtn = document.getElementById('exportJSON');
+  const exportGoogleSheetBtn = document.getElementById('exportGoogleSheet');
+  const exportStatus = document.getElementById('exportStatus');
+
+  // Debug check if buttons exist
+  console.log('Buttons found:', {
+    fetchAll: !!fetchAllButton,
+    bio: !!testDirectFetchButton,
+    degree: !!testDegreeFetchButton,
+    financial: !!testFinancialAidFetchButton,
+    exportCSV: !!exportCSVBtn,
+    exportJSON: !!exportJSONBtn,
+    exportSheets: !!exportGoogleSheetBtn
+  });
+  
   // Listen for storage changes to update UI in real-time
   chrome.storage.onChanged.addListener(function(changes, namespace) {
     if (namespace === 'local') {
@@ -463,4 +480,298 @@ document.addEventListener('DOMContentLoaded', function() {
       updateFinancialAidDisplay(result.financialAidData);
     }
   });
+  
+  // Add export button event listeners
+  if (exportCSVBtn) {
+    exportCSVBtn.addEventListener('click', function() {
+      console.log('CSV export clicked');
+      this.disabled = true;
+      exportToCSV().then(() => {
+        console.log('CSV export completed');
+        exportStatus.textContent = 'CSV exported successfully!';
+        this.disabled = false;
+      }).catch(error => {
+        console.error('CSV export error:', error);
+        exportStatus.textContent = 'Error exporting CSV: ' + error.message;
+        this.disabled = false;
+      });
+    });
+  }
+
+  if (exportJSONBtn) {
+    exportJSONBtn.addEventListener('click', function() {
+      console.log('JSON export clicked');
+      this.disabled = true;
+      exportToJSON().then(() => {
+        console.log('JSON export completed');
+        exportStatus.textContent = 'JSON exported successfully!';
+        this.disabled = false;
+      }).catch(error => {
+        console.error('JSON export error:', error);
+        exportStatus.textContent = 'Error exporting JSON: ' + error.message;
+        this.disabled = false;
+      });
+    });
+  }
+
+  if (exportGoogleSheetBtn) {
+    exportGoogleSheetBtn.addEventListener('click', async function() {
+      console.log('Google Sheets export clicked');
+      this.disabled = true;
+      exportStatus.textContent = 'Exporting to Google Sheets...';
+      
+      try {
+        await exportToGoogleSheets();
+        exportStatus.textContent = 'Successfully exported to Google Sheets!';
+      } catch (error) {
+        console.error('Export error:', error);
+        exportStatus.textContent = 'Error exporting to Google Sheets: ' + error.message;
+      } finally {
+        this.disabled = false;
+      }
+    });
+  }
+
+  // Keep these helper functions outside the DOMContentLoaded listener
+  async function getAllStoredData() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(null, (data) => {
+        resolve({
+          personalInfo: {
+            name: data.name || 'N/A',
+            dob: data.dob || 'N/A'
+          },
+          academicInfo: {
+            degreeName: data.degreeName || 'N/A',
+            creditProgress: data.creditProgress || 'N/A'
+          },
+          schedule: data.scheduleData || { currentTerm: 'N/A', courses: [] },
+          financialAid: {
+            aidYear: data.financialAidData?.aidYear || 'N/A',
+            estimatedBudget: data.financialAidData?.estimatedBudget || 'N/A',
+            familyContribution: data.financialAidData?.familyContribution || 'N/A',
+            estimatedNeed: data.financialAidData?.estimatedNeed || 'N/A',
+            totalAid: data.financialAidData?.totalAid || 'N/A',
+            remainingNeed: data.financialAidData?.remainingNeed || 'N/A'
+          }
+        });
+      });
+    });
+  }
+
+  // Function to export data as CSV
+  async function exportToCSV() {
+    const data = await getAllStoredData();
+    let csvContent = 'Category,Field,Value\n';
+    
+    // Personal Information
+    csvContent += `Personal,Name,${data.personalInfo.name}\n`;
+    csvContent += `Personal,Date of Birth,${data.personalInfo.dob}\n`;
+    
+    // Academic Information
+    csvContent += `Academic,Degree,${data.academicInfo.degreeName}\n`;
+    csvContent += `Academic,Credit Progress,${data.academicInfo.creditProgress}\n`;
+    
+    // Financial Aid
+    csvContent += `Financial Aid,Aid Year,${data.financialAid.aidYear}\n`;
+    csvContent += `Financial Aid,Estimated Budget,${data.financialAid.estimatedBudget}\n`;
+    csvContent += `Financial Aid,Family Contribution,${data.financialAid.familyContribution}\n`;
+    csvContent += `Financial Aid,Estimated Need,${data.financialAid.estimatedNeed}\n`;
+    csvContent += `Financial Aid,Total Aid,${data.financialAid.totalAid}\n`;
+    csvContent += `Financial Aid,Remaining Need,${data.financialAid.remainingNeed}\n`;
+    
+    // Schedule
+    csvContent += `Schedule,Current Term,${data.schedule.currentTerm}\n`;
+    data.schedule.courses?.forEach((course, index) => {
+      csvContent += `Schedule,Course ${index + 1},${course.subject}${course.catalogNumber} - ${course.description}\n`;
+      csvContent += `Schedule,Units,${course.units}\n`;
+      course.meetings?.forEach((meeting, mIndex) => {
+        csvContent += `Schedule,Meeting ${mIndex + 1},${meeting.days} ${meeting.startTime}-${meeting.endTime}\n`;
+      });
+    });
+    
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ctclink_data.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  // Function to export data as JSON
+  async function exportToJSON() {
+    const data = await getAllStoredData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ctclink_data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  // Function to export to Google Sheets
+  async function exportToGoogleSheets() {
+    try {
+      console.log('Starting Google Sheets export...');
+      const token = await new Promise((resolve, reject) => {
+        chrome.identity.getAuthToken({ interactive: true }, (token) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(`Authentication failed: ${chrome.runtime.lastError.message}`));
+            return;
+          }
+          resolve(token);
+        });
+      });
+
+      const data = await getAllStoredData();
+      
+      // Prepare all rows including schedule and financial aid data
+      const rows = [
+        // Headers
+        {values: [
+          {userEnteredValue: {stringValue: 'Category'}},
+          {userEnteredValue: {stringValue: 'Field'}},
+          {userEnteredValue: {stringValue: 'Value'}}
+        ]},
+        // Personal Info
+        {values: [
+          {userEnteredValue: {stringValue: 'Personal'}},
+          {userEnteredValue: {stringValue: 'Name'}},
+          {userEnteredValue: {stringValue: data.personalInfo.name}}
+        ]},
+        {values: [
+          {userEnteredValue: {stringValue: 'Personal'}},
+          {userEnteredValue: {stringValue: 'DOB'}},
+          {userEnteredValue: {stringValue: data.personalInfo.dob}}
+        ]},
+        // Academic Info
+        {values: [
+          {userEnteredValue: {stringValue: 'Academic'}},
+          {userEnteredValue: {stringValue: 'Degree'}},
+          {userEnteredValue: {stringValue: data.academicInfo.degreeName}}
+        ]},
+        {values: [
+          {userEnteredValue: {stringValue: 'Academic'}},
+          {userEnteredValue: {stringValue: 'Progress'}},
+          {userEnteredValue: {stringValue: data.academicInfo.creditProgress}}
+        ]},
+        // Schedule Info
+        {values: [
+          {userEnteredValue: {stringValue: 'Schedule'}},
+          {userEnteredValue: {stringValue: 'Term'}},
+          {userEnteredValue: {stringValue: data.schedule.currentTerm}}
+        ]}
+      ];
+
+      // Add courses
+      if (data.schedule.courses) {
+        data.schedule.courses.forEach((course, index) => {
+          rows.push({
+            values: [
+              {userEnteredValue: {stringValue: 'Course ' + (index + 1)}},
+              {userEnteredValue: {stringValue: 'Name'}},
+              {userEnteredValue: {stringValue: `${course.subject}${course.catalogNumber} - ${course.description}`}}
+            ]
+          });
+          rows.push({
+            values: [
+              {userEnteredValue: {stringValue: 'Course ' + (index + 1)}},
+              {userEnteredValue: {stringValue: 'Units'}},
+              {userEnteredValue: {stringValue: course.units.toString()}}
+            ]
+          });
+          if (course.meetings) {
+            course.meetings.forEach((meeting, mIndex) => {
+              rows.push({
+                values: [
+                  {userEnteredValue: {stringValue: 'Course ' + (index + 1)}},
+                  {userEnteredValue: {stringValue: `Meeting ${mIndex + 1}`}},
+                  {userEnteredValue: {stringValue: `${meeting.days} ${meeting.startTime}-${meeting.endTime}, ${meeting.location}`}}
+                ]
+              });
+            });
+          }
+        });
+      }
+
+      // Financial Aid Info
+      rows.push(
+        {values: [
+          {userEnteredValue: {stringValue: 'Financial Aid'}},
+          {userEnteredValue: {stringValue: 'Aid Year'}},
+          {userEnteredValue: {stringValue: data.financialAid.aidYear}}
+        ]},
+        {values: [
+          {userEnteredValue: {stringValue: 'Financial Aid'}},
+          {userEnteredValue: {stringValue: 'Estimated Budget'}},
+          {userEnteredValue: {stringValue: data.financialAid.estimatedBudget}}
+        ]},
+        {values: [
+          {userEnteredValue: {stringValue: 'Financial Aid'}},
+          {userEnteredValue: {stringValue: 'Family Contribution'}},
+          {userEnteredValue: {stringValue: data.financialAid.familyContribution}}
+        ]},
+        {values: [
+          {userEnteredValue: {stringValue: 'Financial Aid'}},
+          {userEnteredValue: {stringValue: 'Estimated Need'}},
+          {userEnteredValue: {stringValue: data.financialAid.estimatedNeed}}
+        ]},
+        {values: [
+          {userEnteredValue: {stringValue: 'Financial Aid'}},
+          {userEnteredValue: {stringValue: 'Total Aid'}},
+          {userEnteredValue: {stringValue: data.financialAid.totalAid}}
+        ]},
+        {values: [
+          {userEnteredValue: {stringValue: 'Financial Aid'}},
+          {userEnteredValue: {stringValue: 'Remaining Need'}},
+          {userEnteredValue: {stringValue: data.financialAid.remainingNeed}}
+        ]}
+      );
+
+      const response = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          properties: {
+            title: 'CTCLink Data Export'
+          },
+          sheets: [{
+            properties: {
+              title: 'Student Data',
+              gridProperties: {
+                frozenRowCount: 1
+              }
+            },
+            data: [{
+              startRow: 0,
+              startColumn: 0,
+              rowData: rows
+            }]
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      window.open(`https://docs.google.com/spreadsheets/d/${result.spreadsheetId}`);
+      return true;
+
+    } catch (error) {
+      console.error('Detailed export error:', error);
+      throw error;
+    }
+  }
 });

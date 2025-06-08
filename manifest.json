@@ -9,8 +9,17 @@
   },
   "permissions": [
     "storage",
-    "activeTab"
+    "activeTab",
+    "downloads",
+    "identity"
   ],
+  "oauth2": {
+    "client_id": "156431424742-71s8l3icve8s7ha2jn96lvoi3q5j3t2h.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/spreadsheets"
+    ]
+  },
+  "key": "khcbemppicnamnjnjcigmiklkehlkoal",
   "host_permissions": [
     "https://csprd.ctclink.us/*"
   ],
